@@ -1,0 +1,36 @@
+name: 'KLPBBS Automation'
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install selenium requests webdriver-manager cloudscraper beautifulsoup4
+
+      - name: Run Python Script
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          PROMO_URL: ${{ secrets.PROMO_URL }}
+          TARGET_TID: ${{ secrets.TARGET_TID }}
+        run: python main.py
+
+  keepalive-workflow:
+    name: Keepalive Workflow
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: liskin/gh-workflow-keepalive@main
