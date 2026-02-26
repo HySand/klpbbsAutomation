@@ -38,11 +38,10 @@ def main():
     bot = KLPBBSBot(header)
     if bot.login(username, password):
         tasks = KLPBBSTasks(bot)
-        if datetime.now().hour == 16:
-            tasks.daily_sign_in()
+
+        tasks.daily_sign_in()
 
         tasks.run_full_promotion(promo_url)
-
 
         if tasks.should_bump(target_tid):
             f_hash = bot.get_formhash()
