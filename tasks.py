@@ -237,13 +237,10 @@ class KLPBBSTasks:
         """
         self.promo_url = promo_url
 
-        # 1. 启动前补领 & 初始化接取
-        if self._auth_request("draw"):
-            logging.info("启动前补领成功，任务已完成。")
-            return
 
         if not self._auth_request("apply"):
-            logging.warning("任务接取可能失败，但将继续尝试刷流和领奖。")
+            logging.warning("任务接取失败")
+            return
 
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
