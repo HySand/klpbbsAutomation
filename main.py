@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s] [%(asctime)s] %(
 
 
 def should_use_reply_instead_of_bump(record_file="last_reply_date.txt"):
-    today = datetime.date.today().isoformat()
+    today = datetime.today().isoformat()
 
     if not os.path.exists(record_file):
         return True
