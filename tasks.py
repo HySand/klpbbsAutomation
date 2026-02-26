@@ -143,6 +143,35 @@ class KLPBBSTasks:
         else:
             logging.info("今日可能已签到")
 
+    def reply_thread(self, tid, formhash, message="欢迎大家来玩"):
+        logging.info(f"准备在帖子内发送回复: {message}")
+
+        reply_url = f"{self.bot.base_url}/forum.php?mod=post&action=reply&tid={tid}&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1"
+
+        post_data = {
+            "formhash": formhash,
+            "usesig": "1",
+            "subject": "",
+            "message": message,
+            "posttime": int(time.time()),
+        }
+
+        try:
+            response = self.bot.session.post(reply_url, data=post_data, headers=self.bot.headers)
+
+            if "回复发布成功" in response.text or "succeed" in response.text:
+                logging.info("✅ 回复发送成功！")
+                return True
+            elif "非常抱歉，您两次发表间隔少于" in response.text:
+                logging.warning("❌ 触发灌水保护，发送间隔太短。")
+            else:
+                # 打印部分返回内容用于 Debug
+                logging.error(f"❌ 回复失败，返回内容: {response.text[:150]}")
+        except Exception as e:
+            logging.error(f"回复请求异常: {e}")
+
+        return False
+
     def bump_thread(self, tid, formhash):
         """顶贴逻辑"""
         if not formhash:

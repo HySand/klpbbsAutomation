@@ -26,7 +26,10 @@ def main():
 
         tasks.run_full_promotion(promo_url)
 
-        if datetime.now().hour == 0 or datetime.now().hour == 6 or datetime.now().hour == 12:
+        if datetime.now().hour == 0:
+            f_hash = bot.get_formhash()
+            tasks.reply_thread(target_tid, f_hash)
+        if datetime.now().hour == 6 or datetime.now().hour == 12:
             f_hash = bot.get_formhash()
             tasks.bump_thread(target_tid, f_hash)
 
