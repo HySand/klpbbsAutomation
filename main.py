@@ -15,6 +15,8 @@ def should_use_reply_instead_of_bump(record_file="last_reply_date.txt"):
 
     with open(record_file, "r") as f:
         last_date = f.read().strip()
+        logging.info(last_date)
+        logging.info(today)
 
     return last_date != today
 
