@@ -44,7 +44,7 @@ def main():
         tasks.run_full_promotion(promo_url)
 
 
-        if tasks.should_bump(target_tid):
+        if True:
             f_hash = bot.get_formhash()
             if should_use_reply_instead_of_bump():
                 logging.info(1)
