@@ -47,12 +47,10 @@ def main():
         if True:
             f_hash = bot.get_formhash()
             if should_use_reply_instead_of_bump():
-                logging.info(1)
-                #tasks.reply_thread(target_tid, f_hash)
+                tasks.reply_thread(target_tid, f_hash)
                 update_reply_record()
             else:
-                logging.info(2)
-                #tasks.bump_thread(target_tid, f_hash)
+                tasks.bump_thread(target_tid, f_hash)
 
 
 if __name__ == "__main__":
