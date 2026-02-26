@@ -7,6 +7,23 @@ from tasks import KLPBBSTasks
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] [%(asctime)s] %(message)s")
 
 
+def should_use_reply_instead_of_bump(record_file="last_reply_date.txt"):
+    today = datetime.date.today().isoformat()
+
+    if not os.path.exists(record_file):
+        return True
+
+    with open(record_file, "r") as f:
+        last_date = f.read().strip()
+
+    return last_date != today
+
+
+def update_reply_record(record_file="last_reply_date.txt"):
+    today = datetime.date.today().isoformat()
+    with open(record_file, "w") as f:
+        f.write(today)
+
 def main():
     username = os.environ.get("USERNAME")
     password = os.environ.get("PASSWORD")
@@ -26,12 +43,14 @@ def main():
 
         tasks.run_full_promotion(promo_url)
 
-        if datetime.now().hour == 0:
+
+        if tasks.should_bump(target_tid):
             f_hash = bot.get_formhash()
-            tasks.reply_thread(target_tid, f_hash)
-        if datetime.now().hour == 6 or datetime.now().hour == 12:
-            f_hash = bot.get_formhash()
-            tasks.bump_thread(target_tid, f_hash)
+            if should_use_reply_instead_of_bump():
+                #tasks.reply_thread(target_tid, f_hash)
+                update_reply_record()
+            else:
+                tasks.bump_thread(target_tid, f_hash)
 
 
 if __name__ == "__main__":

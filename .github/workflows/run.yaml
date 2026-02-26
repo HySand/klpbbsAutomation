@@ -14,6 +14,14 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Restore/Save Reply Record
+        uses: actions/cache@v3
+        with:
+          path: last_reply_date.txt
+          key: reply-record-${{ github.run_id }}
+          restore-keys: |
+            reply-record-
+
       - name: Install dependencies
         run: |
           pip install selenium requests webdriver-manager cloudscraper beautifulsoup4

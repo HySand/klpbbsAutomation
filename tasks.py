@@ -165,7 +165,6 @@ class KLPBBSTasks:
             elif "非常抱歉，您两次发表间隔少于" in response.text:
                 logging.warning("❌ 触发灌水保护，发送间隔太短。")
             else:
-                # 打印部分返回内容用于 Debug
                 logging.error(f"❌ 回复失败，返回内容: {response.text[:150]}")
         except Exception as e:
             logging.error(f"回复请求异常: {e}")
@@ -194,6 +193,26 @@ class KLPBBSTasks:
         else:
             logging.warning("顶贴失败，检查是否有提升卡或冷却中")
 
+    def should_bump(self, tid, forum_id=56):
+        url = f"{self.bot.base_url}/forum-{forum_id}-1.html"
+        try:
+            res = self.bot.session.get(url, headers=self.bot.headers)
+            html = res.text
+
+            target_pattern = f'id="normalthread_{tid}"'
+            stick_pattern = f'id="stickthread_{tid}"'
+
+            if target_pattern in html or stick_pattern in html:
+                logging.info(f"✅ 帖子 {tid} 已在第一页（普通或置顶），跳过顶贴。")
+                return False
+
+            logging.info(f"⚠️ 第一页未发现帖子 {tid}，准备执行顶贴。")
+            return True
+
+        except Exception as e:
+            logging.error(f"访问板块页面出错: {e}")
+            return True  # 出错时默认为需要顶贴，保证任务成功率
+
     def _auth_request(self, action="apply"):
         """
         使用主账号 Session 执行操作 (接取或领奖)
@@ -215,9 +234,6 @@ class KLPBBSTasks:
         return False
 
     def _proxy_click(self, proxy_url):
-        """
-        匿名刷流：独立请求，不带任何 Cookies
-        """
         proxies = {"http": proxy_url, "https": proxy_url}
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.81",
@@ -231,10 +247,6 @@ class KLPBBSTasks:
             return False
 
     def run_full_promotion(self, promo_url, step_size=12):
-        """
-        基于反馈的推广刷流逻辑
-        :param step_size: 每命中多少次后尝试一次领奖
-        """
         self.promo_url = promo_url
 
 
