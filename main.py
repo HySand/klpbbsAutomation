@@ -20,7 +20,7 @@ def should_use_reply_instead_of_bump(record_file="last_reply_date.txt"):
 
 
 def update_reply_record(record_file="last_reply_date.txt"):
-    today = datetime.date.today().isoformat()
+    today = datetime.today().isoformat()
     with open(record_file, "w") as f:
         f.write(today)
 
