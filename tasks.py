@@ -171,8 +171,26 @@ class KLPBBSTasks:
 
         return False
 
+    def buy_magic(self, formhash, mid = "bump"):
+        if not formhash:
+            logging.warning("未获取到 formhash，跳过购买道具")
+            return
+        url = f"{self.bot.base_url}/home.php?mod=magic&action=shop&infloat=yes&inajax=1"
+        data = {
+            "formhash": formhash,
+            "handlekey": "magics",
+            "operation": "buy",
+            "mid": mid,
+            "magicnum": 1,
+            "operatesubmit": "yes"
+        }
+        res = self.bot.session.post(url, data=data, headers=self.bot.headers)
+        if res.status_code == 200:
+            logging.info(f"道具 {mid} 购买成功")
+        else:
+            logging.warning("购买失败")
+
     def bump_thread(self, tid, formhash):
-        """顶贴逻辑"""
         if not formhash:
             logging.warning("未获取到 formhash，跳过顶贴")
             return

@@ -49,6 +49,7 @@ def main():
                 tasks.reply_thread(target_tid, f_hash)
                 update_reply_record()
             else:
+                tasks.buy_magic(f_hash)
                 tasks.bump_thread(target_tid, f_hash)
 
 
