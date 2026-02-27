@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from datetime import date, timedelta
 
@@ -214,22 +215,20 @@ class KLPBBSTasks:
     def should_bump(self, tid, forum_id=56):
         url = f"{self.bot.base_url}/forum-{forum_id}-1.html"
         try:
-            res = self.bot.session.get(url, headers=self.bot.headers)
-            html = res.text
+            res = self.bot.session.get(url, headers=self.bot.headers, timeout=10)
+            thread_ids = re.findall(r'id="normalthread_(\d+)"', res.text)
 
-            target_pattern = f'id="normalthread_{tid}"'
-            stick_pattern = f'id="stickthread_{tid}"'
-
-            if target_pattern in html or stick_pattern in html:
-                logging.info(f"✅ 帖子 {tid} 已在第一页（普通或置顶），跳过顶贴。")
-                return False
-
-            logging.info(f"⚠️ 第一页未发现帖子 {tid}，准备执行顶贴。")
-            return True
+            if str(tid) in thread_ids:
+                position = thread_ids.index(str(tid)) + 1
+                logging.info(f"📍 帖子 {tid} 当前位于第 {position} 位")
+                return position > 8
+            else:
+                logging.info(f"❌ 帖子 {tid} 不在第一页")
+                return True
 
         except Exception as e:
             logging.error(f"访问板块页面出错: {e}")
-            return True  # 出错时默认为需要顶贴，保证任务成功率
+            return True
 
     def _auth_request(self, action="apply"):
         """
