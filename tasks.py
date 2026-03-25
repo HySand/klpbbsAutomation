@@ -239,7 +239,7 @@ class KLPBBSTasks:
         try:
             res = self.bot.session.get(url, headers=self.bot.headers, timeout=15)
             if action == "apply":
-                success = "任务申请成功" in res.text or "已申请" in res.text
+                success = "任务申请成功" in res.text
                 logging.info(f"[主账号] 任务接取结果: {success}")
                 return success
             if action == "draw":
