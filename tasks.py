@@ -240,6 +240,9 @@ class KLPBBSTasks:
             res = self.bot.session.get(url, headers=self.bot.headers, timeout=15)
             if action == "apply":
                 success = "任务申请成功" in res.text
+                if not success:
+                    logging.info("[主账号] 任务接取未直接成功，正在检查是否有未完成的任务...")
+                    success = self._check_doing_tasks()
                 logging.info(f"[主账号] 任务接取结果: {success}")
                 return success
             if action == "draw":
@@ -249,6 +252,24 @@ class KLPBBSTasks:
         except Exception as e:
             logging.error(f"[主账号] 操作 {action} 异常: {e}")
         return False
+
+    def _check_doing_tasks(self):
+        """
+        检查“进行中的任务”列表
+        """
+        doing_url = f"{self.bot.base_url}/home.php?mod=task&item=doing"
+        try:
+            res = self.bot.session.get(doing_url, headers=self.bot.headers, timeout=15)
+            if 'id=1"' in res.text or "do=draw&id=1" in res.text:
+                logging.info("[主账号] 发现任务 ID 1 已在进行中列表中")
+                return True
+            # if "立即申请" not in res.text and "进行中的任务" in res.text:
+            #     return True
+
+    except Exception as e:
+        logging.error(f"[主账号] 检查进行中任务异常: {e}")
+    
+    return False
 
     def _proxy_click(self, proxy_url):
         proxies = {"http": proxy_url, "https": proxy_url}
